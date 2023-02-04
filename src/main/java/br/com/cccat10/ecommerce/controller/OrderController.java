@@ -1,5 +1,14 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.controller;
 
+import br.com.cccat10.ecommerce.domain.Order;
+import br.com.cccat10.ecommerce.domain.Product;
+import br.com.cccat10.ecommerce.domain.request.OrderRequest;
+import br.com.cccat10.ecommerce.domain.request.ProductRequest;
+import br.com.cccat10.ecommerce.domain.response.OrderResponse;
+import br.com.cccat10.ecommerce.domain.response.ProductResponse;
+import br.com.cccat10.ecommerce.exception.InvalidCpfException;
+import br.com.cccat10.ecommerce.usecase.CreateOrderUseCase;
+import br.com.cccat10.ecommerce.usecase.RetrieveOrderUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

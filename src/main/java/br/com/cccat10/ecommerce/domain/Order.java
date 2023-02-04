@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

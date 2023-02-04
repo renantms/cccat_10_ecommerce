@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.domain.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

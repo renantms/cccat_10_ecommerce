@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.domain;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -6,16 +6,12 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class OrderTest {
-
-    Random random = new Random();
 
     private static final BigDecimal EXPECTED_VALUE_WITHOUT_DISCOUNT = new BigDecimal("47.25");
 
     private static final BigDecimal EXPECTED_VALUE_WITH_DISCOUNT = new BigDecimal("30.72");
-
 
     @Test
     void shouldCalculateOrderValue() {

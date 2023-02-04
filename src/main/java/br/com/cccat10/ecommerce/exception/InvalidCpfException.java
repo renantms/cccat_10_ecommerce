@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.exception;
 
 public class InvalidCpfException extends RuntimeException {
     public static final String INCORRECT_QUANTITY_OF_DIGITS = "CPF com quantidade incorreta de dígitos";

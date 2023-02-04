@@ -1,5 +1,9 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.usecase.impl;
 
+import br.com.cccat10.ecommerce.domain.Order;
+import br.com.cccat10.ecommerce.repository.OrderRepository;
+import br.com.cccat10.ecommerce.usecase.CreateOrderUseCase;
+import br.com.cccat10.ecommerce.validator.CpfValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
