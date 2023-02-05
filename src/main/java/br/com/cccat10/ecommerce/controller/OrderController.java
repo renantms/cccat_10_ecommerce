@@ -4,6 +4,7 @@ import br.com.cccat10.ecommerce.domain.Order;
 import br.com.cccat10.ecommerce.domain.Product;
 import br.com.cccat10.ecommerce.domain.request.OrderRequest;
 import br.com.cccat10.ecommerce.domain.request.ProductRequest;
+import br.com.cccat10.ecommerce.domain.response.CreateOrderResponse;
 import br.com.cccat10.ecommerce.domain.response.OrderResponse;
 import br.com.cccat10.ecommerce.domain.response.ProductResponse;
 import br.com.cccat10.ecommerce.exception.InvalidCpfException;
@@ -45,11 +46,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<BigDecimal> create(@RequestBody final OrderRequest orderRequest) {
+    public ResponseEntity<CreateOrderResponse> create(@RequestBody final OrderRequest orderRequest) {
         try {
             final var order = mapToOrder(orderRequest);
             final BigDecimal totalValue = createOrderUseCase.execute(order, orderRequest.getCouponName());
-            return ResponseEntity.status(HttpStatus.CREATED).body(totalValue);
+            CreateOrderResponse createOrderResponse = new CreateOrderResponse();
+            createOrderResponse.setTotalValue(totalValue);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createOrderResponse);
         } catch (InvalidCpfException e) {
             log.error("Pedido com CPF invalido, invalidCpf={}, message={}",
                     orderRequest.getBuyerCpf(), e.getMessage(), e);
