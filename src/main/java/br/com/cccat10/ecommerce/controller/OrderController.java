@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -44,11 +45,11 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody final OrderRequest orderRequest) {
+    public ResponseEntity<BigDecimal> create(@RequestBody final OrderRequest orderRequest) {
         try {
             final var order = mapToOrder(orderRequest);
-            createOrderUseCase.execute(order);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            final BigDecimal totalValue = createOrderUseCase.execute(order, orderRequest.getCouponName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(totalValue);
         } catch (InvalidCpfException e) {
             log.error("Pedido com CPF invalido, invalidCpf={}, message={}",
                     orderRequest.getBuyerCpf(), e.getMessage(), e);
@@ -64,7 +65,7 @@ public class OrderController {
 
         return OrderResponse.builder()
                 .buyerCpf(order.getBuyerCpf())
-                .discountPercentage(order.getDiscountPercentage())
+                .couponName(order.getCoupon().getCouponName())
                 .productList(productList)
                 .orderDate(order.getCreatedAt())
                 .orderValue(order.getOrderValue())
@@ -87,7 +88,6 @@ public class OrderController {
 
         return Order.builder()
                 .buyerCpf(unmaskCpf(orderRequest.getBuyerCpf()))
-                .discountPercentage(orderRequest.getDiscountPercentage())
                 .productList(productList)
                 .build();
     }

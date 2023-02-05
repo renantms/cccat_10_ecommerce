@@ -2,8 +2,10 @@ package br.com.cccat10.ecommerce.usecase;
 
 import br.com.cccat10.ecommerce.domain.Order;
 
+import java.math.BigDecimal;
+
 public interface CreateOrderUseCase {
 
-    void execute(Order order);
+    BigDecimal execute(Order order, String couponName);
 
 }

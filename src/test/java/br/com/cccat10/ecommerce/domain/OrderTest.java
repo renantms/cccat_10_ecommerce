@@ -36,7 +36,7 @@ public class OrderTest {
         Order order = Order.builder()
                 .buyerCpf("11144477735")
                 .productList(productList)
-                .discountPercentage(new BigDecimal("0.35"))
+                .coupon(createCoupon())
                 .build();
 
         Assertions.assertEquals(EXPECTED_VALUE_WITH_DISCOUNT, order.getOrderValue());
@@ -50,5 +50,13 @@ public class OrderTest {
                 .build();
 
     }
+
+    private Coupon createCoupon() {
+        return Coupon.builder()
+                .couponName("VALE35")
+                .discountPercentage(new BigDecimal("0.35"))
+                .build();
+    }
+
 
 }

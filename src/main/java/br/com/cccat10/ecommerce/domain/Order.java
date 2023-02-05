@@ -31,8 +31,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<Product> productList;
 
-    @Column(name = "discount_percentage", precision = 5, scale = 4)
-    private BigDecimal discountPercentage;
+    private Coupon coupon;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -43,12 +42,13 @@ public class Order {
     private LocalDateTime updatedAt;
 
     public BigDecimal getOrderValue() {
-        BigDecimal orderValue = BigDecimal.ZERO;
+        BigDecimal orderValue = BigDecimal.ZERO.setScale(2, RoundingMode.CEILING);
         for (Product product : productList) {
             orderValue = orderValue.add(product.getPrice());
         }
-        if (discountPercentage != null) {
-            orderValue = orderValue.subtract(orderValue.multiply(discountPercentage)).setScale(2, RoundingMode.CEILING);
+        if (coupon != null) {
+            orderValue = orderValue.subtract(orderValue.multiply(coupon.getDiscountPercentage()))
+                    .setScale(2, RoundingMode.CEILING);
         }
         return orderValue;
     }

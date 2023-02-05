@@ -21,7 +21,7 @@ public class OrderResponse {
 
     private LocalDateTime orderDate;
 
-    private BigDecimal discountPercentage;
+    private String couponName;
 
     private BigDecimal orderValue;
 
