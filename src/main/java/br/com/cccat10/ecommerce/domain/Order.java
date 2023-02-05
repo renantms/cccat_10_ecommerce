@@ -31,6 +31,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<Product> productList;
 
+    @ManyToOne
+    @JoinColumn(name = "id_coupon")
     private Coupon coupon;
 
     @Column(name = "created_at")

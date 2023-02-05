@@ -3,8 +3,8 @@ package br.com.cccat10.ecommerce.repository;
 import br.com.cccat10.ecommerce.domain.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CouponRepository extends JpaRepository<Long, Coupon> {
+public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
-    Coupon findByName(String couponName);
+    Coupon findByCouponName(String couponName);
 
 }

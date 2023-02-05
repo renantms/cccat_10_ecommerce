@@ -25,7 +25,7 @@ public class CreateOrderUseCaseImpl implements CreateOrderUseCase {
     public BigDecimal execute(final Order order, String couponName) {
         cpfValidator.validate(order.getBuyerCpf());
         if (couponName != null) {
-            Coupon coupon = couponRepository.findByName(couponName);
+            Coupon coupon = couponRepository.findByCouponName(couponName);
             order.setCoupon(coupon);
         }
         order.getProductList().forEach(product -> product.setOrder(order));

@@ -35,7 +35,7 @@ public class CreateOrderUseCaseImplTest {
         Assertions.assertAll(
                 () -> Assertions.assertEquals(new BigDecimal("72.63"), totalValue),
                 () -> Mockito.verify(cpfValidator, Mockito.times(1)).validate(order.getBuyerCpf()),
-                () -> Mockito.verify(couponRepository, Mockito.times(0)).findByName(Mockito.any()),
+                () -> Mockito.verify(couponRepository, Mockito.times(0)).findByCouponName(Mockito.any()),
                 () -> Mockito.verify(orderRepository, Mockito.times(1)).save(Mockito.any())
         );
     }
@@ -44,14 +44,14 @@ public class CreateOrderUseCaseImplTest {
     void shouldCreateOrderWithCouponAndReturnTotalValue() {
         Order order = createOrder();
         Coupon coupon = createCoupon();
-        Mockito.when(couponRepository.findByName(coupon.getCouponName())).thenReturn(coupon);
+        Mockito.when(couponRepository.findByCouponName(coupon.getCouponName())).thenReturn(coupon);
 
         BigDecimal totalValue = createOrderUseCase.execute(order, coupon.getCouponName());
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(new BigDecimal("58.11"), totalValue),
                 () -> Mockito.verify(cpfValidator, Mockito.times(1)).validate(order.getBuyerCpf()),
-                () -> Mockito.verify(couponRepository, Mockito.times(1)).findByName(coupon.getCouponName()),
+                () -> Mockito.verify(couponRepository, Mockito.times(1)).findByCouponName(coupon.getCouponName()),
                 () -> Mockito.verify(orderRepository, Mockito.times(1)).save(Mockito.any())
         );
     }
