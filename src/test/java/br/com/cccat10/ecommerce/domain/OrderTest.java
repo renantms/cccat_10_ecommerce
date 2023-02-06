@@ -9,15 +9,15 @@ import java.util.List;
 
 public class OrderTest {
 
-    private static final BigDecimal EXPECTED_VALUE_WITHOUT_DISCOUNT = new BigDecimal("47.25");
+    private static final BigDecimal EXPECTED_VALUE_WITHOUT_DISCOUNT = new BigDecimal("236.25");
 
-    private static final BigDecimal EXPECTED_VALUE_WITH_DISCOUNT = new BigDecimal("30.72");
+    private static final BigDecimal EXPECTED_VALUE_WITH_DISCOUNT = new BigDecimal("153.57");
 
     @Test
     void shouldCalculateOrderValue() {
-        List<Product> productList = new ArrayList<>();
+        List<OrderProduct> productList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            productList.add(createProduct());
+            productList.add(createOrderProduct());
         }
         Order order = Order.builder()
                 .buyerCpf("11144477735")
@@ -29,9 +29,9 @@ public class OrderTest {
 
     @Test
     void shouldCalculateOrderValueWithDiscount() {
-        List<Product> productList = new ArrayList<>();
+        List<OrderProduct> productList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            productList.add(createProduct());
+            productList.add(createOrderProduct());
         }
         Order order = Order.builder()
                 .buyerCpf("11144477735")
@@ -44,11 +44,18 @@ public class OrderTest {
 
     Product createProduct() {
         return Product.builder()
-                .quantity(5)
                 .price(new BigDecimal("15.75"))
                 .description("AAAAAAAAAAAA")
                 .build();
 
+    }
+
+    OrderProduct createOrderProduct() {
+        OrderProduct orderProduct = new OrderProduct();
+
+        orderProduct.setProduct(createProduct());
+        orderProduct.setQuantity(5L);
+        return orderProduct;
     }
 
     private Coupon createCoupon() {
