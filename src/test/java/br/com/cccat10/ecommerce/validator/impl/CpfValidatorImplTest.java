@@ -1,5 +1,7 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.validator.impl;
 
+import br.com.cccat10.ecommerce.exception.InvalidCpfException;
+import br.com.cccat10.ecommerce.validator.CpfValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

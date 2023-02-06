@@ -1,5 +1,6 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.domain.response;
 
+import br.com.cccat10.ecommerce.domain.response.ProductResponse;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
@@ -20,7 +21,7 @@ public class OrderResponse {
 
     private LocalDateTime orderDate;
 
-    private BigDecimal discountPercentage;
+    private String couponName;
 
     private BigDecimal orderValue;
 

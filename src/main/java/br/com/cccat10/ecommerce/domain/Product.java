@@ -1,5 +1,6 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.domain;
 
+import br.com.cccat10.ecommerce.domain.Order;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,12 +27,5 @@ public class Product {
 
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
-
-    @Column(name = "quantity")
-    private Integer quantity;
-
-    @ManyToOne
-    @JoinColumn(name = "id_order")
-    private Order order;
 
 }

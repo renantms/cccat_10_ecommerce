@@ -1,19 +1,19 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.domain.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ProductRequest {
+public class OrderRequest {
 
-    private String description;
+    private String buyerCpf;
 
-    private BigDecimal price;
+    private List<ProductRequest> productList;
 
-    private Integer quantity;
+    private String couponName;
 
 }
