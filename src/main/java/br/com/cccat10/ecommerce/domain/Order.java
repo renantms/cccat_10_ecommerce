@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,8 +29,8 @@ public class Order {
     @Column(name = "buyer_cpf")
     private String buyerCpf;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
-    private List<Product> productList;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderProduct> productList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "id_coupon")
@@ -43,10 +44,15 @@ public class Order {
     @CreationTimestamp
     private LocalDateTime updatedAt;
 
+    public void addProduct(Product product, Long quantity) {
+        OrderProduct orderProduct = new OrderProduct(this, product, quantity);
+        productList.add(orderProduct);
+    }
+
     public BigDecimal getOrderValue() {
         BigDecimal orderValue = BigDecimal.ZERO.setScale(2, RoundingMode.CEILING);
-        for (Product product : productList) {
-            orderValue = orderValue.add(product.getPrice());
+        for (OrderProduct product : productList) {
+            orderValue = orderValue.add(product.getTotalValue());
         }
         if (coupon != null) {
             orderValue = orderValue.subtract(orderValue.multiply(coupon.getDiscountPercentage()))

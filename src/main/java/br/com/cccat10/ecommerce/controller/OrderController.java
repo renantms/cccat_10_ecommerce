@@ -1,7 +1,8 @@
 package br.com.cccat10.ecommerce.controller;
 
 import br.com.cccat10.ecommerce.domain.Order;
-import br.com.cccat10.ecommerce.domain.Product;
+import br.com.cccat10.ecommerce.domain.OrderProduct;
+import br.com.cccat10.ecommerce.domain.dto.ProductDTO;
 import br.com.cccat10.ecommerce.domain.request.OrderRequest;
 import br.com.cccat10.ecommerce.domain.request.ProductRequest;
 import br.com.cccat10.ecommerce.domain.response.CreateOrderResponse;
@@ -17,8 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -49,7 +52,9 @@ public class OrderController {
     public ResponseEntity<CreateOrderResponse> create(@RequestBody final OrderRequest orderRequest) {
         try {
             final var order = mapToOrder(orderRequest);
-            final BigDecimal totalValue = createOrderUseCase.execute(order, orderRequest.getCouponName());
+            final var products = mapToProductDTO(orderRequest.getProductList());
+
+            final BigDecimal totalValue = createOrderUseCase.execute(order, orderRequest.getCouponName(), products);
             CreateOrderResponse createOrderResponse = new CreateOrderResponse();
             createOrderResponse.setTotalValue(totalValue);
             return ResponseEntity.status(HttpStatus.CREATED).body(createOrderResponse);
@@ -75,35 +80,29 @@ public class OrderController {
                 .build();
     }
 
-    private List<ProductResponse> mapToProductResponseList(final List<Product> productList) {
+    private List<ProductResponse> mapToProductResponseList(final List<OrderProduct> productList) {
         return productList.stream()
                 .map(product ->
                         ProductResponse.builder()
-                                .description(product.getDescription())
-                                .price(product.getPrice())
+                                .description(product.getProduct().getDescription())
+                                .price(product.getProduct().getPrice())
                                 .quantity(product.getQuantity())
                                 .build())
                 .toList();
     }
 
-    private Order mapToOrder(final OrderRequest orderRequest) {
-        final var productList = mapToProductList(orderRequest.getProductList());
-
-        return Order.builder()
-                .buyerCpf(unmaskCpf(orderRequest.getBuyerCpf()))
-                .productList(productList)
-                .build();
+    private List<ProductDTO> mapToProductDTO(final List<ProductRequest> productRequestList) {
+        return productRequestList
+                .stream()
+                .map(ProductRequest::toDTO)
+                .collect(Collectors.toList());
     }
 
-    private List<Product> mapToProductList(final List<ProductRequest> productRequestList) {
-        return productRequestList.stream()
-                .map(productRequest ->
-                        Product.builder()
-                                .description(productRequest.getDescription())
-                                .price(productRequest.getPrice())
-                                .quantity(productRequest.getQuantity())
-                                .build())
-                .toList();
+    private Order mapToOrder(final OrderRequest orderRequest) {
+        return Order.builder()
+                .buyerCpf(unmaskCpf(orderRequest.getBuyerCpf()))
+                .productList(new ArrayList<>())
+                .build();
     }
 
     private String unmaskCpf(final String cpf) {

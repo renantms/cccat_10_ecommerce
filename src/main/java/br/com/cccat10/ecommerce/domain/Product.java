@@ -28,11 +28,4 @@ public class Product {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "quantity")
-    private Integer quantity;
-
-    @ManyToOne
-    @JoinColumn(name = "id_order")
-    private Order order;
-
 }
