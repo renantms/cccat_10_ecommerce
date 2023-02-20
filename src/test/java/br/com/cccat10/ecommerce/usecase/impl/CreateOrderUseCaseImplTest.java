@@ -9,6 +9,7 @@ import br.com.cccat10.ecommerce.repository.OrderRepository;
 import br.com.cccat10.ecommerce.repository.ProductRepository;
 import br.com.cccat10.ecommerce.usecase.CreateOrderUseCase;
 import br.com.cccat10.ecommerce.validator.CpfValidator;
+import br.com.cccat10.ecommerce.validator.ItemValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,13 +24,15 @@ public class CreateOrderUseCaseImplTest {
 
     CpfValidator cpfValidator = Mockito.mock(CpfValidator.class);
 
+    ItemValidator itemValidator = Mockito.mock(ItemValidator.class);
+
     OrderRepository orderRepository = Mockito.mock(OrderRepository.class);
 
     CouponRepository couponRepository = Mockito.mock(CouponRepository.class);
 
     ProductRepository productRepository = Mockito.mock(ProductRepository.class);
 
-    CreateOrderUseCase createOrderUseCase = new CreateOrderUseCaseImpl(cpfValidator, orderRepository, couponRepository, productRepository);
+    CreateOrderUseCase createOrderUseCase = new CreateOrderUseCaseImpl(cpfValidator, itemValidator, orderRepository, couponRepository, productRepository);
 
 
     @Test
@@ -43,7 +46,7 @@ public class CreateOrderUseCaseImplTest {
         BigDecimal totalValue = createOrderUseCase.execute(order, null, List.of(productDTO));
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(new BigDecimal("121.05"), totalValue),
+                () -> Assertions.assertEquals(new BigDecimal("271.05"), totalValue),
                 () -> Mockito.verify(cpfValidator, Mockito.times(1)).validate(order.getBuyerCpf()),
                 () -> Mockito.verify(couponRepository, Mockito.times(0)).findByCouponName(Mockito.any()),
                 () -> Mockito.verify(orderRepository, Mockito.times(1)).save(Mockito.any())
@@ -63,7 +66,7 @@ public class CreateOrderUseCaseImplTest {
         BigDecimal totalValue = createOrderUseCase.execute(order, coupon.getCouponName(), List.of(productDTO));
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(new BigDecimal("96.84"), totalValue),
+                () -> Assertions.assertEquals(new BigDecimal("216.84"), totalValue),
                 () -> Mockito.verify(cpfValidator, Mockito.times(1)).validate(order.getBuyerCpf()),
                 () -> Mockito.verify(couponRepository, Mockito.times(1)).findByCouponName(coupon.getCouponName()),
                 () -> Mockito.verify(orderRepository, Mockito.times(1)).save(Mockito.any())
@@ -89,6 +92,10 @@ public class CreateOrderUseCaseImplTest {
         return Product.builder()
                 .price(new BigDecimal("24.21"))
                 .description("AAAAAAAAAAAA")
+                .height(100L)
+                .width(30L)
+                .length(10L)
+                .weight(new BigDecimal("3"))
                 .build();
 
     }

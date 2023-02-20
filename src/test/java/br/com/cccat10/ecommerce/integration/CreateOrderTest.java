@@ -1,5 +1,7 @@
 package br.com.cccat10.ecommerce.integration;
 
+import br.com.cccat10.ecommerce.exception.DuplicatedItemException;
+import br.com.cccat10.ecommerce.exception.InvalidQuantityException;
 import br.com.cccat10.ecommerce.integration.base.BaseIntegrationTest;
 import br.com.cccat10.ecommerce.domain.Coupon;
 import br.com.cccat10.ecommerce.domain.Product;
@@ -34,9 +36,7 @@ public class CreateOrderTest extends BaseIntegrationTest {
 
     @Test
     void shouldCreateOrder() {
-        Product product = new Product();
-        product.setPrice(new BigDecimal("30"));
-        product.setDescription("AAAAAAAAAAAA");
+        Product product = createProduct();
 
         Product savedProduct = productRepository.save(product);
 
@@ -56,14 +56,12 @@ public class CreateOrderTest extends BaseIntegrationTest {
                 .body()
                 .as(CreateOrderResponse.class);
 
-        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("150")));
+        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("300")));
     }
 
     @Test
     void shouldCreateOrderWithCoupon() {
-        Product product = new Product();
-        product.setPrice(new BigDecimal("30"));
-        product.setDescription("AAAAAAAAAAAA");
+        Product product = createProduct();
 
         Product savedProduct = productRepository.save(product);
 
@@ -88,14 +86,12 @@ public class CreateOrderTest extends BaseIntegrationTest {
                 .body()
                 .as(CreateOrderResponse.class);
 
-        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("120")));
+        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("240")));
     }
 
     @Test
     void shouldCreateOrderWithCouponExpired() {
-        Product product = new Product();
-        product.setPrice(new BigDecimal("30"));
-        product.setDescription("AAAAAAAAAAAA");
+        Product product = createProduct();
 
         Product savedProduct = productRepository.save(product);
 
@@ -120,7 +116,55 @@ public class CreateOrderTest extends BaseIntegrationTest {
                 .body()
                 .as(CreateOrderResponse.class);
 
-        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("150")));
+        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("300")));
+    }
+
+    @Test
+    void shouldNotCreateOrderWhenItemIsDuplicated() {
+        Product product = createProduct();
+
+        Product savedProduct = productRepository.save(product);
+
+        OrderRequest orderRequest = createOrderRequest(savedProduct.getId());
+        orderRequest.getProductList().add(createProductRequest(savedProduct.getId()));
+        RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(orderRequest)
+                .log().all()
+                .when()
+                .post("/orders")
+                .then()
+                .statusCode(422)
+                .body("message", Matchers.is(DuplicatedItemException.ERROR_MESSAGE));
+    }
+
+    @Test
+    void shouldNotCreateOrderWhenItemHasInvalidQuantity() {
+        Product product = createProduct();
+
+        Product savedProduct = productRepository.save(product);
+
+        OrderRequest orderRequest = createOrderRequestWithoutItem();
+        orderRequest.setProductList(List.of(createProductRequestWithInvalidQuantity(savedProduct.getId())));
+
+        RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(orderRequest)
+                .log().all()
+                .when()
+                .post("/orders")
+                .then()
+                .log().all()
+                .statusCode(422)
+                .body("message", Matchers.is(InvalidQuantityException.ERROR_MESSAGE));
+    }
+
+    OrderRequest createOrderRequestWithoutItem() {
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setBuyerCpf("11144477735");
+        return orderRequest;
     }
 
     OrderRequest createOrderRequest(Long productId) {
@@ -145,5 +189,24 @@ public class CreateOrderTest extends BaseIntegrationTest {
         productRequest.setId(productId);
         productRequest.setQuantity(5L);
         return productRequest;
+    }
+
+    ProductRequest createProductRequestWithInvalidQuantity(Long productId) {
+        ProductRequest productRequest = new ProductRequest();
+
+        productRequest.setId(productId);
+        productRequest.setQuantity(-1L);
+        return productRequest;
+    }
+
+    Product createProduct() {
+        Product product = new Product();
+        product.setPrice(new BigDecimal("30"));
+        product.setDescription("AAAAAAAAAAAA");
+        product.setHeight(100L);
+        product.setWidth(30L);
+        product.setLength(10L);
+        product.setWeight(new BigDecimal("3"));
+        return product;
     }
 }

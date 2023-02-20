@@ -3,9 +3,9 @@ package br.com.cccat10.ecommerce.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 @Entity
@@ -35,7 +35,11 @@ public class OrderProduct {
     }
 
     public BigDecimal getTotalValue() {
-        return product.getPrice().multiply(new BigDecimal(quantity));
+        return product.getPrice().multiply(new BigDecimal(quantity)).add(getFreightValue());
+    }
+
+    public BigDecimal getFreightValue() {
+        return product.getFreightValue().multiply(new BigDecimal(quantity)).setScale(2, RoundingMode.CEILING);
     }
 
 }
