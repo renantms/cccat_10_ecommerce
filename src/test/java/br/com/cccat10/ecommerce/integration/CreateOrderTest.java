@@ -1,11 +1,12 @@
-package br.com.cccat10.ecommerce;
+package br.com.cccat10.ecommerce.integration;
 
-import br.com.cccat10.ecommerce.base.BaseIntegrationTest;
+import br.com.cccat10.ecommerce.integration.base.BaseIntegrationTest;
 import br.com.cccat10.ecommerce.domain.Coupon;
 import br.com.cccat10.ecommerce.domain.Product;
 import br.com.cccat10.ecommerce.domain.request.OrderRequest;
 import br.com.cccat10.ecommerce.domain.request.ProductRequest;
 import br.com.cccat10.ecommerce.domain.response.CreateOrderResponse;
+import br.com.cccat10.ecommerce.integration.base.CleanupH2DatabaseTestListener;
 import br.com.cccat10.ecommerce.repository.CouponRepository;
 import br.com.cccat10.ecommerce.repository.ProductRepository;
 import io.restassured.RestAssured;
@@ -14,11 +15,15 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanupH2DatabaseTestListener.class})
 public class CreateOrderTest extends BaseIntegrationTest {
 
     @Autowired
@@ -67,6 +72,7 @@ public class CreateOrderTest extends BaseIntegrationTest {
         Coupon coupon = new Coupon();
         coupon.setCouponName(orderRequest.getCouponName());
         coupon.setDiscountPercentage(new BigDecimal("0.20"));
+        coupon.setExpireDate(LocalDateTime.now().plusDays(1L));
         couponRepository.save(coupon);
 
         CreateOrderResponse response = RestAssured
@@ -83,6 +89,38 @@ public class CreateOrderTest extends BaseIntegrationTest {
                 .as(CreateOrderResponse.class);
 
         MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("120")));
+    }
+
+    @Test
+    void shouldCreateOrderWithCouponExpired() {
+        Product product = new Product();
+        product.setPrice(new BigDecimal("30"));
+        product.setDescription("AAAAAAAAAAAA");
+
+        Product savedProduct = productRepository.save(product);
+
+        OrderRequest orderRequest = createOrderRequestWithCoupon(savedProduct.getId());
+
+        Coupon expiredCoupon = new Coupon();
+        expiredCoupon.setCouponName(orderRequest.getCouponName());
+        expiredCoupon.setDiscountPercentage(new BigDecimal("0.20"));
+        expiredCoupon.setExpireDate(LocalDateTime.now().minusDays(1L));
+        couponRepository.save(expiredCoupon);
+
+        CreateOrderResponse response = RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(orderRequest)
+                .log().all()
+                .when()
+                .post("/orders")
+                .then()
+                .statusCode(201)
+                .extract()
+                .body()
+                .as(CreateOrderResponse.class);
+
+        MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("150")));
     }
 
     OrderRequest createOrderRequest(Long productId) {

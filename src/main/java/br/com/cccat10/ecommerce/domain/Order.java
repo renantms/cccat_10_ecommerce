@@ -54,7 +54,7 @@ public class Order {
         for (OrderProduct product : productList) {
             orderValue = orderValue.add(product.getTotalValue());
         }
-        if (coupon != null) {
+        if (coupon != null && LocalDateTime.now().isBefore(coupon.getExpireDate())) {
             orderValue = orderValue.subtract(orderValue.multiply(coupon.getDiscountPercentage()))
                     .setScale(2, RoundingMode.CEILING);
         }

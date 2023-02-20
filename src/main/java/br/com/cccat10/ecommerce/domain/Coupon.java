@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -23,5 +24,8 @@ public class Coupon {
 
     @Column(name = "discount_percentage", precision = 5, scale = 4)
     private BigDecimal discountPercentage;
+
+    @Column(name = "expire_date")
+    private LocalDateTime expireDate;
 
 }

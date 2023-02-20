@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +74,7 @@ public class CreateOrderUseCaseImplTest {
         return Coupon.builder()
                 .couponName("VALE20")
                 .discountPercentage(new BigDecimal("0.20"))
+                .expireDate(LocalDateTime.now().plusDays(1L))
                 .build();
     }
 

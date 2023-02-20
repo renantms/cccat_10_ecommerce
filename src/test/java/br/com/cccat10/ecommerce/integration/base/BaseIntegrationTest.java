@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce.base;
+package br.com.cccat10.ecommerce.integration.base;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
