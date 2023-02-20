@@ -9,6 +9,7 @@ import br.com.cccat10.ecommerce.repository.OrderRepository;
 import br.com.cccat10.ecommerce.repository.ProductRepository;
 import br.com.cccat10.ecommerce.usecase.CreateOrderUseCase;
 import br.com.cccat10.ecommerce.validator.CpfValidator;
+import br.com.cccat10.ecommerce.validator.ItemValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,8 @@ public class CreateOrderUseCaseImpl implements CreateOrderUseCase {
 
     private final CpfValidator cpfValidator;
 
+    private final ItemValidator itemValidator;
+
     private final OrderRepository orderRepository;
 
     private final CouponRepository couponRepository;
@@ -30,6 +33,8 @@ public class CreateOrderUseCaseImpl implements CreateOrderUseCase {
     @Override
     public BigDecimal execute(final Order order, final String couponName, final List<ProductDTO> products) {
         cpfValidator.validate(order.getBuyerCpf());
+        itemValidator.validate(products);
+
         if (couponName != null) {
             Coupon coupon = couponRepository.findByCouponName(couponName);
             order.setCoupon(coupon);

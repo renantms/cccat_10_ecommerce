@@ -6,9 +6,12 @@ import br.com.cccat10.ecommerce.domain.dto.ProductDTO;
 import br.com.cccat10.ecommerce.domain.request.OrderRequest;
 import br.com.cccat10.ecommerce.domain.request.ProductRequest;
 import br.com.cccat10.ecommerce.domain.response.CreateOrderResponse;
+import br.com.cccat10.ecommerce.domain.response.ErrorResponse;
 import br.com.cccat10.ecommerce.domain.response.OrderResponse;
 import br.com.cccat10.ecommerce.domain.response.ProductResponse;
+import br.com.cccat10.ecommerce.exception.DuplicatedItemException;
 import br.com.cccat10.ecommerce.exception.InvalidCpfException;
+import br.com.cccat10.ecommerce.exception.InvalidQuantityException;
 import br.com.cccat10.ecommerce.usecase.CreateOrderUseCase;
 import br.com.cccat10.ecommerce.usecase.RetrieveOrderUseCase;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +52,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateOrderResponse> create(@RequestBody final OrderRequest orderRequest) {
+    public ResponseEntity<?> create(@RequestBody final OrderRequest orderRequest) {
         try {
             final var order = mapToOrder(orderRequest);
             final var products = mapToProductDTO(orderRequest.getProductList());
@@ -58,10 +61,13 @@ public class OrderController {
             CreateOrderResponse createOrderResponse = new CreateOrderResponse();
             createOrderResponse.setTotalValue(totalValue);
             return ResponseEntity.status(HttpStatus.CREATED).body(createOrderResponse);
+        } catch (InvalidQuantityException | DuplicatedItemException e) {
+            log.error("{}, cpf={}", e.getMessage(), orderRequest.getBuyerCpf(), e);
+            return ResponseEntity.unprocessableEntity().body(new ErrorResponse(e.getMessage()));
         } catch (InvalidCpfException e) {
             log.error("Pedido com CPF invalido, invalidCpf={}, message={}",
                     orderRequest.getBuyerCpf(), e.getMessage(), e);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         } catch (Exception e) {
             log.error("Erro inesperado, buyerCpf={}, message={}", orderRequest.getBuyerCpf(), e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
