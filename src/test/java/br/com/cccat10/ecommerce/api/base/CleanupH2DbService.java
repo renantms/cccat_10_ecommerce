@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce.integration.base;
+package br.com.cccat10.ecommerce.api.base;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;

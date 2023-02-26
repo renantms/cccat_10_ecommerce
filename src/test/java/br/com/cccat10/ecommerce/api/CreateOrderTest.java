@@ -1,4 +1,4 @@
-package br.com.cccat10.ecommerce.integration;
+package br.com.cccat10.ecommerce.api;
 
 import br.com.cccat10.ecommerce.exception.DuplicatedItemException;
 import br.com.cccat10.ecommerce.exception.InvalidQuantityException;
