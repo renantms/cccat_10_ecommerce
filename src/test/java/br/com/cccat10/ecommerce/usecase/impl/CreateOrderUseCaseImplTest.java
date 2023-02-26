@@ -3,7 +3,9 @@ package br.com.cccat10.ecommerce.usecase.impl;
 import br.com.cccat10.ecommerce.domain.Coupon;
 import br.com.cccat10.ecommerce.domain.Order;
 import br.com.cccat10.ecommerce.domain.Product;
+import br.com.cccat10.ecommerce.domain.dto.OrderValueDTO;
 import br.com.cccat10.ecommerce.domain.dto.ProductDTO;
+import br.com.cccat10.ecommerce.generator.OrderIdGenerator;
 import br.com.cccat10.ecommerce.repository.CouponRepository;
 import br.com.cccat10.ecommerce.repository.OrderRepository;
 import br.com.cccat10.ecommerce.repository.ProductRepository;
@@ -39,17 +41,20 @@ public class CreateOrderUseCaseImplTest {
 
 
     @Test
-    void shouldCreateOrderAndReturnTotalValue() {
+    void shouldCreateOrderAndReturnOrderValue() {
         Order order = createOrder();
         ProductDTO productDTO = createProductDTO();
         Product product = createProduct();
 
         Mockito.when(productRepository.findById(productDTO.getId())).thenReturn(Optional.of(product));
 
-        BigDecimal totalValue = createOrderUseCase.execute(order, null, List.of(productDTO));
+        Mockito.when(orderIdGenerator.generateUniqueId()).thenReturn("1");
+
+        OrderValueDTO orderValue = createOrderUseCase.execute(order, null, List.of(productDTO));
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(new BigDecimal("271.05"), totalValue),
+                () -> Assertions.assertEquals(new BigDecimal("271.05"), orderValue.getTotalValue()),
+                () -> Assertions.assertEquals(new BigDecimal("150.00"), orderValue.getFreightValue()),
                 () -> Mockito.verify(cpfValidator, Mockito.times(1)).validate(order.getBuyerCpf()),
                 () -> Mockito.verify(couponRepository, Mockito.times(0)).findByCouponName(Mockito.any()),
                 () -> Mockito.verify(orderRepository, Mockito.times(1)).save(Mockito.any())
@@ -65,11 +70,13 @@ public class CreateOrderUseCaseImplTest {
 
         Mockito.when(productRepository.findById(productDTO.getId())).thenReturn(Optional.of(product));
         Mockito.when(couponRepository.findByCouponName(coupon.getCouponName())).thenReturn(coupon);
+        Mockito.when(orderIdGenerator.generateUniqueId()).thenReturn("1");
 
-        BigDecimal totalValue = createOrderUseCase.execute(order, coupon.getCouponName(), List.of(productDTO));
+        OrderValueDTO orderValue = createOrderUseCase.execute(order, coupon.getCouponName(), List.of(productDTO));
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(new BigDecimal("216.84"), totalValue),
+                () -> Assertions.assertEquals(new BigDecimal("216.84"), orderValue.getTotalValue()),
+                () -> Assertions.assertEquals(new BigDecimal("150.00"), orderValue.getFreightValue()),
                 () -> Mockito.verify(cpfValidator, Mockito.times(1)).validate(order.getBuyerCpf()),
                 () -> Mockito.verify(couponRepository, Mockito.times(1)).findByCouponName(coupon.getCouponName()),
                 () -> Mockito.verify(orderRepository, Mockito.times(1)).save(Mockito.any())

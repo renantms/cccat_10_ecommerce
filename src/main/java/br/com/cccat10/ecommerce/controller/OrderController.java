@@ -2,6 +2,7 @@ package br.com.cccat10.ecommerce.controller;
 
 import br.com.cccat10.ecommerce.domain.Order;
 import br.com.cccat10.ecommerce.domain.OrderProduct;
+import br.com.cccat10.ecommerce.domain.dto.OrderValueDTO;
 import br.com.cccat10.ecommerce.domain.dto.ProductDTO;
 import br.com.cccat10.ecommerce.domain.request.OrderRequest;
 import br.com.cccat10.ecommerce.domain.request.ProductRequest;
@@ -57,9 +58,10 @@ public class OrderController {
             final var order = mapToOrder(orderRequest);
             final var products = mapToProductDTO(orderRequest.getProductList());
 
-            final BigDecimal totalValue = createOrderUseCase.execute(order, orderRequest.getCouponName(), products);
+            final OrderValueDTO orderValue = createOrderUseCase.execute(order, orderRequest.getCouponName(), products);
             CreateOrderResponse createOrderResponse = new CreateOrderResponse();
-            createOrderResponse.setTotalValue(totalValue);
+            createOrderResponse.setTotalValue(orderValue.getTotalValue());
+            createOrderResponse.setFreightValue(orderValue.getFreightValue());
             return ResponseEntity.status(HttpStatus.CREATED).body(createOrderResponse);
         } catch (InvalidQuantityException | DuplicatedItemException e) {
             log.error("{}, cpf={}", e.getMessage(), orderRequest.getBuyerCpf(), e);
@@ -82,7 +84,7 @@ public class OrderController {
                 .couponName(order.getCoupon().getCouponName())
                 .productList(productList)
                 .orderDate(order.getCreatedAt())
-                .orderValue(order.getOrderValue())
+                .orderValue(order.calculateOrderValue().getTotalValue())
                 .build();
     }
 

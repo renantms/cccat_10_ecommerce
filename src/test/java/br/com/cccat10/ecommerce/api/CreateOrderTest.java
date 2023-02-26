@@ -1,14 +1,14 @@
 package br.com.cccat10.ecommerce.api;
 
-import br.com.cccat10.ecommerce.exception.DuplicatedItemException;
-import br.com.cccat10.ecommerce.exception.InvalidQuantityException;
-import br.com.cccat10.ecommerce.integration.base.BaseIntegrationTest;
+import br.com.cccat10.ecommerce.api.base.BaseApiTest;
+import br.com.cccat10.ecommerce.api.base.CleanupH2DatabaseTestListener;
 import br.com.cccat10.ecommerce.domain.Coupon;
 import br.com.cccat10.ecommerce.domain.Product;
 import br.com.cccat10.ecommerce.domain.request.OrderRequest;
 import br.com.cccat10.ecommerce.domain.request.ProductRequest;
 import br.com.cccat10.ecommerce.domain.response.CreateOrderResponse;
-import br.com.cccat10.ecommerce.integration.base.CleanupH2DatabaseTestListener;
+import br.com.cccat10.ecommerce.exception.DuplicatedItemException;
+import br.com.cccat10.ecommerce.exception.InvalidQuantityException;
 import br.com.cccat10.ecommerce.repository.CouponRepository;
 import br.com.cccat10.ecommerce.repository.ProductRepository;
 import io.restassured.RestAssured;
@@ -42,7 +42,6 @@ public class CreateOrderTest extends BaseApiTest {
 
         OrderRequest orderRequest = createOrderRequest(savedProduct.getId());
 
-
         CreateOrderResponse response = RestAssured
                 .given()
                 .contentType(ContentType.JSON)
@@ -57,6 +56,7 @@ public class CreateOrderTest extends BaseApiTest {
                 .as(CreateOrderResponse.class);
 
         MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("300")));
+        MatcherAssert.assertThat(response.getFreightValue(), Matchers.comparesEqualTo(new BigDecimal("150")));
     }
 
     @Test
@@ -87,6 +87,7 @@ public class CreateOrderTest extends BaseApiTest {
                 .as(CreateOrderResponse.class);
 
         MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("240")));
+        MatcherAssert.assertThat(response.getFreightValue(), Matchers.comparesEqualTo(new BigDecimal("150")));
     }
 
     @Test
@@ -117,6 +118,7 @@ public class CreateOrderTest extends BaseApiTest {
                 .as(CreateOrderResponse.class);
 
         MatcherAssert.assertThat(response.getTotalValue(), Matchers.comparesEqualTo(new BigDecimal("300")));
+        MatcherAssert.assertThat(response.getFreightValue(), Matchers.comparesEqualTo(new BigDecimal("150")));
     }
 
     @Test

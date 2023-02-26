@@ -1,5 +1,6 @@
 package br.com.cccat10.ecommerce.domain;
 
+import br.com.cccat10.ecommerce.domain.dto.OrderValueDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,11 @@ import java.util.List;
 public class OrderTest {
     private static final BigDecimal EXPECTED_VALUE_WITHOUT_DISCOUNT = new BigDecimal("228.75");
 
+    private static final BigDecimal EXPECTED_FREIGHT = new BigDecimal("150.00");
+
     private static final BigDecimal EXPECTED_VALUE_WITH_MINIMUM_FREIGHT = new BigDecimal("128.75");
+
+    private static final BigDecimal EXPECTED_WITH_MINIMUM_FREIGHT = new BigDecimal("50.00");
 
     private static final BigDecimal EXPECTED_VALUE_WITH_DISCOUNT = new BigDecimal("148.69");
 
@@ -25,7 +30,10 @@ public class OrderTest {
                 .productList(productList)
                 .build();
 
-        Assertions.assertEquals(EXPECTED_VALUE_WITHOUT_DISCOUNT, order.getOrderValue());
+        OrderValueDTO orderValueDTO = order.calculateOrderValue();
+
+        Assertions.assertEquals(EXPECTED_VALUE_WITHOUT_DISCOUNT, orderValueDTO.getTotalValue());
+        Assertions.assertEquals(EXPECTED_FREIGHT, orderValueDTO.getFreightValue());
     }
 
     @Test
@@ -39,7 +47,10 @@ public class OrderTest {
                 .coupon(createCoupon())
                 .build();
 
-        Assertions.assertEquals(EXPECTED_VALUE_WITH_DISCOUNT, order.getOrderValue());
+        OrderValueDTO orderValueDTO = order.calculateOrderValue();
+
+        Assertions.assertEquals(EXPECTED_VALUE_WITH_DISCOUNT, orderValueDTO.getTotalValue());
+        Assertions.assertEquals(EXPECTED_FREIGHT, orderValueDTO.getFreightValue());
     }
 
     @Test
@@ -53,7 +64,10 @@ public class OrderTest {
                 .coupon(createExpiredCoupon())
                 .build();
 
-        Assertions.assertEquals(EXPECTED_VALUE_WITHOUT_DISCOUNT, order.getOrderValue());
+        OrderValueDTO orderValueDTO = order.calculateOrderValue();
+
+        Assertions.assertEquals(EXPECTED_VALUE_WITHOUT_DISCOUNT, orderValueDTO.getTotalValue());
+        Assertions.assertEquals(EXPECTED_FREIGHT, orderValueDTO.getFreightValue());
     }
 
     @Test
@@ -66,7 +80,10 @@ public class OrderTest {
                 .productList(productList)
                 .build();
 
-        Assertions.assertEquals(EXPECTED_VALUE_WITH_MINIMUM_FREIGHT, order.getOrderValue());
+        OrderValueDTO orderValueDTO = order.calculateOrderValue();
+
+        Assertions.assertEquals(EXPECTED_VALUE_WITH_MINIMUM_FREIGHT, orderValueDTO.getTotalValue());
+        Assertions.assertEquals(EXPECTED_WITH_MINIMUM_FREIGHT, orderValueDTO.getFreightValue());
     }
 
     Product createProduct() {

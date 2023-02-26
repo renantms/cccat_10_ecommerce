@@ -12,4 +12,6 @@ public class CreateOrderResponse {
 
     private BigDecimal totalValue;
 
+    private BigDecimal freightValue;
+
 }
