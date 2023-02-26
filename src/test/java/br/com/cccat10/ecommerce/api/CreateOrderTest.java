@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanupH2DatabaseTestListener.class})
-public class CreateOrderTest extends BaseIntegrationTest {
+public class CreateOrderTest extends BaseApiTest {
 
     @Autowired
     private CouponRepository couponRepository;

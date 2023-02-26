@@ -26,13 +26,16 @@ public class CreateOrderUseCaseImplTest {
 
     ItemValidator itemValidator = Mockito.mock(ItemValidator.class);
 
+    OrderIdGenerator orderIdGenerator = Mockito.mock(OrderIdGenerator.class);
+
     OrderRepository orderRepository = Mockito.mock(OrderRepository.class);
 
     CouponRepository couponRepository = Mockito.mock(CouponRepository.class);
 
     ProductRepository productRepository = Mockito.mock(ProductRepository.class);
 
-    CreateOrderUseCase createOrderUseCase = new CreateOrderUseCaseImpl(cpfValidator, itemValidator, orderRepository, couponRepository, productRepository);
+    CreateOrderUseCase createOrderUseCase = new CreateOrderUseCaseImpl(cpfValidator, itemValidator, orderIdGenerator,
+            orderRepository, couponRepository, productRepository);
 
 
     @Test
